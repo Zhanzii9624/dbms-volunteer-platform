@@ -9,10 +9,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
 import com.example.demo.service.CustomUserDetailsService;
 
 @Configuration
 public class SecurityConfig {
+
     @Bean
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService();
@@ -36,13 +38,18 @@ public class SecurityConfig {
         http
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/users").permitAll()
+                        .requestMatchers("/volunteer").permitAll()
+                        .requestMatchers("/organization").permitAll()
+                        .requestMatchers("/supervisor").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                         .anyRequest().permitAll())
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
                         .usernameParameter("email")
-                        .defaultSuccessUrl("/users", true)
+                        .defaultSuccessUrl("/userhome", true)
                         .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/api/user/logout")
@@ -50,8 +57,10 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll());
+
         http.csrf(csrf -> csrf.disable());
         http.cors(cors -> cors.disable());
         return http.build();
     }
 }
+
